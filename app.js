@@ -1,21 +1,21 @@
-const SUPABASE_URL = "https://YOUR-PROJECT-REF.supabase.co"; // Replace with your actual Supabase Project URL
-const SUPABASE_ANON_KEY = "YOUR_ANON_PUBLIC_KEY";          // Replace with your actual Supabase Anon Key
+const SUPABASE_URL = "https://pcwpnhluaqfgstkrmvie.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_6lx3SK9RSLTDfMfieaUUdA_vYF28OAp";
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // Fetch products live from Supabase
-async function loadProducts() {  
-  const { data: products, error } = await supabase    
-    .from("product")    
-    .select("*, category(category_name)")    
-    .order("name");   
+async function loadProducts() {
+  const { data: products, error } = await supabase
+    .from("product")
+    .select("*, category(category_name)")
+    .order("name");
 
-  if (error) {    
-    document.getElementById("product-list").innerHTML = `<p>Could not load products: ${error.message}</p>`;    
-    return;  
-  }  
-  
+  if (error) {
+    document.getElementById("product-list").innerHTML = `<p>Could not load products: ${error.message}</p>`;
+    return;
+  }
+
   renderProducts(products);
-} 
+}
 
 function renderProducts(list) {
   const container = document.getElementById("product-list");
@@ -29,10 +29,10 @@ function renderProducts(list) {
 
   list.forEach(product => {
     const stockLabel = 
-      product.stock === 0 
-        ? "Out of Stock" 
-        : product.stock <= 5 
-        ? "Low Stock" 
+      product.stock === 0
+        ? "Out of Stock"
+        : product.stock <= 5
+        ? "Low Stock"
         : "In Stock";
 
     container.innerHTML += `
