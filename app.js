@@ -1,10 +1,10 @@
 const SUPABASE_URL = "https://pcwpnhluaqfgstkrmvie.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_6lx3SK9RSLTDfMfieaUUdA_vYF28OAp";
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // Fetch products live from Supabase
 async function loadProducts() {
-  const { data: products, error } = await supabase
+  const { data: products, error } = await supabaseClient
     .from("product")
     .select("*, category(category_name)")
     .order("name");
