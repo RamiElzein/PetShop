@@ -1,1 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Product Details</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <h1 class="logo">ShopNow</h1>
+    <nav class="main-nav">
+      <a href="index.html">Home</a>
+      <a href="products.html">Products</a>
+      <a href="about.html">About</a>
+    </nav>
+  </header>
 
+  <main>
+    <section id="detail" style="padding: 20px;">
+      <p>Loading product details...</p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>&copy; 2025 ShopNow.</p>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const SUPABASE_URL = "https://YOUR-PROJECT-REF.supabase.co";
+    const SUPABASE_ANON_KEY = "YOUR_ANON_PUBLIC_KEY";
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    const params = new URLSearchParams(window.location.search);
+    const productId = params.get("id");
+
+    async function loadProduct() {
+      const { data: product, error } = await supabase
+        .from("product")
+        .select("*, category(category_name)")
+        .eq("product_id", productId)
+        .single();
+
+      if (error || !product) {
+        document.getElementById("detail").innerHTML = "<p>Product not found.</p>";
+        return;
+      }
+
+      document.getElementById("detail").innerHTML = `
+        <h2>${product.name}</h2>
+        <p>${product.description || ""}</p>
+        <p><strong>Price:</strong> AED ${product.price}</p>
+        <p><strong>Category:</strong> ${product.category ? product.category.category_name : "N/A"}</p>
+        <p><strong>Stock:</strong> ${product.stock}</p>
+      `;
+    }
+
+    loadProduct();
+  </script>
+</body>
+</html>
+```[cite: 4]
+
+### Step 3: Save and Commit
+Scroll down and click the green **Commit new file** button. 
+
+*(Don't forget: Make sure to replace `YOUR-PROJECT-REF` and `YOUR_ANON_PUBLIC_KEY` in both your `app.js` and `product-detail.html` files with your actual Supabase project keys so it can connect to your database!)* 
+
+Let me know once you've saved this last file, and your lab will be fully ready!
