@@ -3,50 +3,42 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ShopNow — Products</title>
+  <title>Products - ShopNow</title>
   <link rel="stylesheet" href="css/style.css">
+  <!-- Supabase JS CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
   <header class="site-header">
     <h1 class="logo">ShopNow</h1>
     <nav class="main-nav">
       <a href="index.html">Home</a>
-      <a href="products.html">Products</a>
+      <a href="products.html" class="active">Products</a>
       <a href="about.html">About</a>
     </nav>
   </header>
 
-  <main>
-    <section class="products-header">
-      <h2>Our Products</h2>
-      <p>Find the technology you need at honest prices.</p>
-    </section>
+  <main style="padding: 20px;">
+    <h2>Our Products</h2>
+    <p>Find the technology you need at honest prices.</p>
+    
+    <!-- Search and Filters -->
+    <div style="margin-bottom: 20px;">
+      <input type="text" id="search-bar" placeholder="Search products..." style="padding: 5px; width: 200px;">
+      <div id="category-filters" style="display: inline-block; margin-left: 10px;"></div>
+    </div>
 
-    <section class="filters">
-      <input type="text" id="search-box" placeholder="Search products...">
-      <div class="category-buttons">
-        <button class="category-btn" data-category="All">All</button>
-        <button class="category-btn" data-category="Computers">Computers</button>
-        <button class="category-btn" data-category="Phones">Phones</button>
-        <button class="category-btn" data-category="Accessories">Accessories</button>
-      </div>
-      <select id="sort-select">
-        <option value="default">Sort Products</option>
-        <option value="low-high">Price: Low to High</option>
-        <option value="high-low">Price: High to Low</option>
-      </select>
-    </section>
-
-    <section class="product-grid" id="product-list"></section>
+    <!-- Product List Container -->
+    <div id="product-list" style="display: flex; flex-wrap: wrap; gap: 20px;">
+      <p>Loading products...</p>
+    </div>
   </main>
 
   <footer class="site-footer">
     <p>&copy; 2025 ShopNow.</p>
   </footer>
 
-  <!-- Supabase CDN Script (Required for Lab 4) -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- App Script -->
   <script src="js/app.js"></script>
 </body>
 </html>
-```[cite: 4]
