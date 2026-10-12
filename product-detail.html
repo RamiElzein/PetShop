@@ -3,12 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Product Details</title>
+  <title>Product Details - ShopNow</title>
   <link rel="stylesheet" href="css/style.css">
-  <!-- Supabase JS CDN -->
+  <!-- Supabase CDN -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
+
   <header class="site-header">
     <h1 class="logo">ShopNow</h1>
     <nav class="main-nav">
@@ -18,10 +19,11 @@
     </nav>
   </header>
 
-  <main>
-    <section id="detail" style="padding: 20px;">
+  <main style="padding: 20px;">
+    <p><a href="products.html">&larr; Back to Products</a></p>
+    <div id="product-detail-container">
       <p>Loading product details...</p>
-    </section>
+    </div>
   </main>
 
   <footer class="site-footer">
@@ -31,45 +33,49 @@
   <script>
     const SUPABASE_URL = "https://pcwpnhluaqfgstkrmvie.supabase.co";
     const SUPABASE_ANON_KEY = "sb_publishable_6lx3SK9RSLTDfMfieaUUdA_vYF28OAp";
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     async function loadProductDetail() {
-      const params = new URLSearchParams(window.location.search);
-      const productId = params.get("id");
+      // Extract 'id' from URL query parameters (e.g. ?id=3)
+      const urlParams = new URLSearchParams(window.location.search);
+      const productId = urlParams.get("id");
+
+      const container = document.getElementById("product-detail-container");
 
       if (!productId) {
-        document.getElementById("detail").innerHTML = "<p>No product specified.</p>";
+        container.innerHTML = "<p>No product ID provided.</p>";
         return;
       }
 
-      const { data: product, error } = await supabase
+      // Fetch single product matching product_id from Supabase
+      const { data: product, error } = await supabaseClient
         .from("product")
         .select("*, category(category_name)")
         .eq("product_id", productId)
         .single();
 
-      const detailSection = document.getElementById("detail");
-
       if (error || !product) {
-        detailSection.innerHTML = `<p>Could not load product details: ${error ? error.message : "Product not found"}</p>`;
+        container.innerHTML = "<p>Error loading product details: " + (error ? error.message : "Product not found.") + "</p>";
         return;
       }
 
-      const stockLabel = 
-        product.stock === 0
-          ? "Out of Stock"
-          : product.stock <= 5
-          ? "Low Stock"
-          : "In Stock";
+      let stockLabel = "In Stock";
+      if (product.stock === 0) {
+        stockLabel = "Out of Stock";
+      } else if (product.stock <= 5) {
+        stockLabel = "Low Stock";
+      }
 
-      detailSection.innerHTML = `
-        <h2>${product.name}</h2>
-        <p><strong>Category:</strong> ${product.category ? product.category.category_name : "N/A"}</p>
-        <p><strong>Price:</strong> AED ${product.price.toLocaleString()}</p>
-        <p><strong>Stock Status:</strong> <span class="stock">${stockLabel}</span> (${product.stock} available)</p>
-        <p><strong>Description:</strong> ${product.description || "No description available."}</p>
-        <p><a href="products.html">&larr; Back to Products</a></p>
-      `;
+      const categoryName = product.category ? product.category.category_name : "N/A";
+
+      container.innerHTML = 
+        '<div class="product-detail-card" style="border: 1px solid #ccc; padding: 20px; max-width: 500px; border-radius: 8px;">' +
+          '<h2>' + product.name + '</h2>' +
+          '<p><strong>Category:</strong> ' + categoryName + '</p>' +
+          '<p><strong>Price:</strong> AED ' + product.price.toLocaleString() + '</p>' +
+          '<p><strong>Stock Status:</strong> ' + stockLabel + ' (' + product.stock + ' units available)</p>' +
+          '<p><strong>Description:</strong> ' + (product.description || 'No description available.') + '</p>' +
+        '</div>';
     }
 
     loadProductDetail();
