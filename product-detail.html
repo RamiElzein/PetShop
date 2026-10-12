@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Product Details</title>
   <link rel="stylesheet" href="css/style.css">
+  <!-- Supabase JS CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
   <header class="site-header">
@@ -26,45 +28,51 @@
     <p>&copy; 2025 ShopNow.</p>
   </footer>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-    const SUPABASE_URL = "https://YOUR-PROJECT-REF.supabase.co";
-    const SUPABASE_ANON_KEY = "YOUR_ANON_PUBLIC_KEY";
+    const SUPABASE_URL = "https://pcwpnhluaqfgstkrmvie.supabase.co";
+    const SUPABASE_ANON_KEY = "sb_publishable_6lx3SK9RSLTDfMfieaUUdA_vYF28OAp";
     const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    const params = new URLSearchParams(window.location.search);
-    const productId = params.get("id");
+    async function loadProductDetail() {
+      const params = new URLSearchParams(window.location.search);
+      const productId = params.get("id");
 
-    async function loadProduct() {
+      if (!productId) {
+        document.getElementById("detail").innerHTML = "<p>No product specified.</p>";
+        return;
+      }
+
       const { data: product, error } = await supabase
         .from("product")
         .select("*, category(category_name)")
         .eq("product_id", productId)
         .single();
 
+      const detailSection = document.getElementById("detail");
+
       if (error || !product) {
-        document.getElementById("detail").innerHTML = "<p>Product not found.</p>";
+        detailSection.innerHTML = `<p>Could not load product details: ${error ? error.message : "Product not found"}</p>`;
         return;
       }
 
-      document.getElementById("detail").innerHTML = `
+      const stockLabel = 
+        product.stock === 0
+          ? "Out of Stock"
+          : product.stock <= 5
+          ? "Low Stock"
+          : "In Stock";
+
+      detailSection.innerHTML = `
         <h2>${product.name}</h2>
-        <p>${product.description || ""}</p>
-        <p><strong>Price:</strong> AED ${product.price}</p>
         <p><strong>Category:</strong> ${product.category ? product.category.category_name : "N/A"}</p>
-        <p><strong>Stock:</strong> ${product.stock}</p>
+        <p><strong>Price:</strong> AED ${product.price.toLocaleString()}</p>
+        <p><strong>Stock Status:</strong> <span class="stock">${stockLabel}</span> (${product.stock} available)</p>
+        <p><strong>Description:</strong> ${product.description || "No description available."}</p>
+        <p><a href="products.html">&larr; Back to Products</a></p>
       `;
     }
 
-    loadProduct();
+    loadProductDetail();
   </script>
 </body>
 </html>
-```[cite: 4]
-
-### Step 3: Save and Commit
-Scroll down and click the green **Commit new file** button. 
-
-*(Don't forget: Make sure to replace `YOUR-PROJECT-REF` and `YOUR_ANON_PUBLIC_KEY` in both your `app.js` and `product-detail.html` files with your actual Supabase project keys so it can connect to your database!)* 
-
-Let me know once you've saved this last file, and your lab will be fully ready!
