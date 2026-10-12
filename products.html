@@ -1,44 +1,50 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Products - ShopNow</title>
-  <link rel="stylesheet" href="css/style.css">
-  <!-- Supabase JS CDN -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-</head>
-<body>
-  <header class="site-header">
-    <h1 class="logo">ShopNow</h1>
-    <nav class="main-nav">
-      <a href="index.html">Home</a>
-      <a href="products.html" class="active">Products</a>
-      <a href="about.html">About</a>
-    </nav>
-  </header>
+const SUPABASE_URL = "https://pcwpnhluaqfgstkrmvie.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_6lx3SK9RSLTDfMfieaUUdA_vYF28OAp";
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  <main style="padding: 20px;">
-    <h2>Our Products</h2>
-    <p>Find the technology you need at honest prices.</p>
-    
-    <!-- Search and Filters -->
-    <div style="margin-bottom: 20px;">
-      <input type="text" id="search-bar" placeholder="Search products..." style="padding: 5px; width: 200px;">
-      <div id="category-filters" style="display: inline-block; margin-left: 10px;"></div>
-    </div>
+// Fetch products live from Supabase
+async function loadProducts() {
+  const { data: products, error } = await supabaseClient
+    .from("product")
+    .select("*, category(category_name)")
+    .order("name");
 
-    <!-- Product List Container -->
-    <div id="product-list" style="display: flex; flex-wrap: wrap; gap: 20px;">
-      <p>Loading products...</p>
-    </div>
-  </main>
+  if (error) {
+    document.getElementById("product-list").innerHTML = `<p>Could not load products: ${error.message}</p>`;
+    return;
+  }
 
-  <footer class="site-footer">
-    <p>&copy; 2025 ShopNow.</p>
-  </footer>
+  renderProducts(products);
+}
 
-  <!-- App Script -->
-  <script src="app.js"></script>
-</body>
-</html>
+function renderProducts(list) {
+  const container = document.getElementById("product-list");
+  if (!container) return;
+  container.innerHTML = "";
+
+  if (list.length === 0) {
+    container.innerHTML = "<p>No products match your search.</p>";
+    return;
+  }
+
+  list.forEach(product => {
+    const stockLabel = 
+      product.stock === 0
+        ? "Out of Stock"
+        : product.stock <= 5
+        ? "Low Stock"
+        : "In Stock";
+
+    container.innerHTML += `
+      <div class="product">
+        <h3>${product.name}</h3>
+        <p>Category: ${product.category ? product.category.category_name : "N/A"}</p>
+        <p>AED ${product.price.toLocaleString()}</p>
+        <p class="stock">${stockLabel}</p>
+        <a href="product-detail.html?id=${product.product_id}">View details</a>
+      </div>
+    `;
+  });
+}
+
+loadProducts();
