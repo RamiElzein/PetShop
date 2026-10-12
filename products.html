@@ -1,50 +1,56 @@
-const SUPABASE_URL = "https://pcwpnhluaqfgstkrmvie.supabase.co";
-const SUPABASE_ANON_KEY = "sb_publishable_6lx3SK9RSLTDfMfieaUUdA_vYF28OAp";
-const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Products - ShopNow</title>
+  <link rel="stylesheet" href="css/style.css">
+  <!-- Supabase CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
 
-// Fetch products live from Supabase
-async function loadProducts() {
-  const { data: products, error } = await supabaseClient
-    .from("product")
-    .select("*, category(category_name)")
-    .order("name");
+  <header class="site-header">
+    <h1 class="logo">ShopNow</h1>
+    <nav class="main-nav">
+      <a href="index.html">Home</a>
+      <a href="products.html">Products</a>
+      <a href="about.html">About</a>
+    </nav>
+  </header>
 
-  if (error) {
-    document.getElementById("product-list").innerHTML = `<p>Could not load products: ${error.message}</p>`;
-    return;
-  }
+  <main>
+    <section class="products-header">
+      <h2>Our Products</h2>
+      <p>Find the technology you need at honest prices.</p>
+    </section>
 
-  renderProducts(products);
-}
-
-function renderProducts(list) {
-  const container = document.getElementById("product-list");
-  if (!container) return;
-  container.innerHTML = "";
-
-  if (list.length === 0) {
-    container.innerHTML = "<p>No products match your search.</p>";
-    return;
-  }
-
-  list.forEach(product => {
-    const stockLabel = 
-      product.stock === 0
-        ? "Out of Stock"
-        : product.stock <= 5
-        ? "Low Stock"
-        : "In Stock";
-
-    container.innerHTML += `
-      <div class="product">
-        <h3>${product.name}</h3>
-        <p>Category: ${product.category ? product.category.category_name : "N/A"}</p>
-        <p>AED ${product.price.toLocaleString()}</p>
-        <p class="stock">${stockLabel}</p>
-        <a href="product-detail.html?id=${product.product_id}">View details</a>
+    <section class="filters">
+      <input type="text" id="search-box" placeholder="Search products...">
+      
+      <div class="category-buttons">
+        <button class="category-btn" data-category="All">All</button>
+        <button class="category-btn" data-category="Computers">Computers</button>
+        <button class="category-btn" data-category="Phones">Phones</button>
+        <button class="category-btn" data-category="Accessories">Accessories</button>
       </div>
-    `;
-  });
-}
 
-loadProducts();
+      <select id="sort-select">
+        <option value="default">Sort Products</option>
+        <option value="low-high">Price: Low to High</option>
+        <option value="high-low">Price: High to Low</option>
+      </select>
+    </section>
+
+    <section class="product-grid" id="product-list">
+      <p>Loading products...</p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>&copy; 2025 ShopNow.</p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
