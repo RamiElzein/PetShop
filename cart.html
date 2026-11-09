@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shopping Cart</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="container">
+    <a href="products.html">&larr; Back to Products</a>
+    <h1>Your Shopping Cart</h1>
+    
+    <div id="cart-container"></div>
+    <div id="cart-summary" style="margin-top: 20px;"></div>
+    
+    <button id="clear-cart" class="btn" style="margin-top: 15px; background-color: #ff4d4d; display: none;">Clear Cart</button>
+  </div>
+
+  <script>
+    const cartContainer = document.getElementById('cart-container');
+    const cartSummary = document.getElementById('cart-summary');
+    const clearBtn = document.getElementById('clear-cart');
+
+    function renderCart() {
+      let cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+      if (cart.length === 0) {
+        cartContainer.innerHTML = `<p>Your cart is empty.</p>`;
+        cartSummary.innerHTML = ``;
+        clearBtn.style.display = 'none';
+        return;
+      }
+
+      clearBtn.style.display = 'block';
+      let total = 0;
+
+      cartContainer.innerHTML = cart.map((item, index) => {
+        total += item.price;
+        return `
+          <div class="cart-item" style="border-bottom: 1px solid #ccc; padding: 10px 0;">
+            <h3>${item.name}</h3>
+            <p><strong>Price:</strong> $${item.price}</p>
+          </div>
+        `;
+      }).join('');
+
+      cartSummary.innerHTML = `<h2>Total: $${total}</h2>`;
+    }
+
+    clearBtn.addEventListener('click', () => {
+      localStorage.removeItem('cart');
+      renderCart();
+    });
+
+    renderCart();
+  </script>
+</body>
+</html>
