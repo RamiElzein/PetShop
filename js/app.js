@@ -1,33 +1,41 @@
-// Initialize Supabase Client
-const SUPABASE_URL = 'https://qwarunqonuuqxntlfo.supabase.co';
-const SUPABASE_ANON_KEY = 'sb_publishable__7B1OZCaAdI9Mecm4SlOAw_urzY8tJk';
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+// Initialize Supabase client using the corrected URL
+const SUPABASE_URL = "https://qwarunqonuuqxntlumfo.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable__7B1OZCaAdI9Mecm4SlOAw_urzY8tJk";
 
-// Fetch products dynamically from Supabase
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// Function to fetch and display products
 async function loadProducts() {
-  const { data: products, error } = await supabase.from('products').select('*');
-  
-  if (error) {
-    console.error('Error fetching products:', error);
-    return;
-  }
+    try {
+        const { data: products, error } = await supabaseClient
+            .from('products')
+            .select('*');
 
-  const container = document.getElementById('product-list');
-  if (!container) return;
+        if (error) {
+            console.error('Error fetching products:', error);
+            return;
+        }
 
-  container.innerHTML = '';
-  products.forEach(product => {
-    const productCard = document.createElement('div');
-    productCard.className = 'product-card';
-    productCard.innerHTML = `
-      <img src="${product.image || 'https://via.placeholder.com/150'}" alt="${product.name}" style="width: 100%; height: 150px; object-fit: cover;">
-      <h3>${product.name}</h3>
-      <p>$${product.price}</p>
-      <p>${product.description}</p>
-      <a href="product-detail.html?id=${product.id}" class="btn">View Details</a>
-    `;
-    container.appendChild(productCard);
-  });
+        const productList = document.getElementById('product-list');
+        if (!productList) return;
+
+        productList.innerHTML = '';
+
+        products.forEach(product => {
+            const productCard = document.createElement('div');
+            productCard.className = 'product-card';
+            productCard.innerHTML = `
+                <h3>${product.name}</h3>
+                <p>${product.description || ''}</p>
+                <p><strong>$${product.price}</strong></p>
+                <a href="product-detail.html?id=${product.id}">View Details</a>
+            `;
+            productList.appendChild(productCard);
+        });
+    } catch (err) {
+        console.error('Unexpected error:', err);
+    }
 }
 
+// Run on page load
 document.addEventListener('DOMContentLoaded', loadProducts);
