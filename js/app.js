@@ -64,10 +64,18 @@ async function setupHeader() {
 }
 
 // ---------- Products ----------
+const categoryIcons = { Food: "🍖", Toys: "🧶", Beds: "🛏️", Enclosures: "🏠", Accessories: "🦴" };
+
+// Product photo, or an icon box if the product has no photo
+function productImage(p) {
+  if (p.image) return `<img src="${escapeHtml(p.image)}" alt="${escapeHtml(p.name)}">`;
+  return `<div class="no-image">${categoryIcons[p.category] || "🐾"}</div>`;
+}
+
 function productCard(p) {
   return `
     <div class="product">
-      <img src="${escapeHtml(p.image || "images/cat1.jpg")}" alt="${escapeHtml(p.name)}">
+      ${productImage(p)}
       <h3>${escapeHtml(p.name)}</h3>
       <p class="category">${escapeHtml(p.category || "")}</p>
       <p class="price">${formatPrice(p.price)}</p>
