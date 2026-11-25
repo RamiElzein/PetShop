@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Product - PetShop</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+  <header class="site-header">
+    <a href="index.html" class="logo">PetShop</a>
+    <nav class="main-nav">
+      <a href="index.html">Home</a>
+      <a href="products.html">Products</a>
+      <a href="cart.html">Cart (<span id="cart-count">0</span>)</a>
+      <a href="about.html">About</a>
+      <a href="login.html" id="auth-link">Log in</a>
+    </nav>
+  </header>
+  <div id="message"></div>
+
+  <main class="container">
+    <a href="products.html">&larr; Back to products</a>
+    <div id="product-detail"><p>Loading...</p></div>
+  </main>
+
+  <footer>&copy; 2026 PetShop. Pet supplies and enclosures for your home pets.</footer>
+  <script src="js/app.js"></script>
+  <script>
+    async function loadDetail() {
+      const id = new URLSearchParams(window.location.search).get("id");
+      const box = document.getElementById("product-detail");
+      const { data: p, error } = await supabaseClient.from("products").select("*").eq("id", id).single();
+      if (error || !p) { box.innerHTML = "<p>Product not found.</p>"; return; }
+      box.innerHTML = `
+        <div class="detail">
+          <img src="${escapeHtml(p.image || "images/cat1.jpg")}" alt="${escapeHtml(p.name)}">
+          <div>
+            <h1>${escapeHtml(p.name)}</h1>
+            <p class="category">${escapeHtml(p.category || "")}</p>
+            <p class="price">${formatPrice(p.price)}</p>
+            <p>${escapeHtml(p.description || "")}</p>
+            <button class="btn" id="add-btn">Add to Cart</button>
+          </div>
+        </div>`;
+      document.getElementById("add-btn").onclick = () => addToCart(p);
+    }
+    loadDetail();
+  </script>
+</body>
+</html>

@@ -3,56 +3,66 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Shopping Cart</title>
+  <title>Cart - PetShop</title>
   <link rel="stylesheet" href="css/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
-  <div class="container">
-    <a href="products.html">&larr; Back to Products</a>
-    <h1>Your Shopping Cart</h1>
-    
-    <div id="cart-container"></div>
-    <div id="cart-summary" style="margin-top: 20px;"></div>
-    
-    <button id="clear-cart" class="btn" style="margin-top: 15px; background-color: #ff4d4d; display: none;">Clear Cart</button>
-  </div>
+  <header class="site-header">
+    <a href="index.html" class="logo">PetShop</a>
+    <nav class="main-nav">
+      <a href="index.html">Home</a>
+      <a href="products.html">Products</a>
+      <a href="cart.html">Cart (<span id="cart-count">0</span>)</a>
+      <a href="about.html">About</a>
+      <a href="login.html" id="auth-link">Log in</a>
+    </nav>
+  </header>
+  <div id="message"></div>
 
+  <main class="container">
+    <h1>Your Cart</h1>
+    <div id="cart-items"></div>
+    <div id="cart-total"></div>
+    <div id="cart-actions" class="actions">
+      <button class="btn grey" id="clear-cart">Clear cart</button>
+      <a class="btn" href="checkout.html">Checkout</a>
+    </div>
+  </main>
+
+  <footer>&copy; 2026 PetShop. Pet supplies and enclosures for your home pets.</footer>
+  <script src="js/app.js"></script>
   <script>
-    const cartContainer = document.getElementById('cart-container');
-    const cartSummary = document.getElementById('cart-summary');
-    const clearBtn = document.getElementById('clear-cart');
-
     function renderCart() {
-      let cart = JSON.parse(localStorage.getItem('cart')) || [];
-
+      const cart = getCart();
+      const items = document.getElementById("cart-items");
       if (cart.length === 0) {
-        cartContainer.innerHTML = `<p>Your cart is empty.</p>`;
-        cartSummary.innerHTML = ``;
-        clearBtn.style.display = 'none';
+        items.innerHTML = '<p>Your cart is empty. <a href="products.html">Browse products</a></p>';
+        document.getElementById("cart-total").innerHTML = "";
+        document.getElementById("cart-actions").style.display = "none";
         return;
       }
+      items.innerHTML = cart.map((item, i) => `
+        <div class="cart-row">
+          <span>${escapeHtml(item.name)}</span>
+          <span>${formatPrice(item.price)}</span>
+          <input type="number" min="1" value="${item.quantity}" data-i="${i}">
+          <span>${formatPrice(item.price * item.quantity)}</span>
+          <button class="link" data-remove="${i}">Remove</button>
+        </div>`).join("");
+      const total = cart.reduce((s, i) => s + i.price * i.quantity, 0);
+      document.getElementById("cart-total").innerHTML = "<h2>Total: " + formatPrice(total) + "</h2>";
 
-      clearBtn.style.display = 'block';
-      let total = 0;
-
-      cartContainer.innerHTML = cart.map((item, index) => {
-        total += item.price;
-        return `
-          <div class="cart-item" style="border-bottom: 1px solid #ccc; padding: 10px 0;">
-            <h3>${item.name}</h3>
-            <p><strong>Price:</strong> $${item.price}</p>
-          </div>
-        `;
-      }).join('');
-
-      cartSummary.innerHTML = `<h2>Total: $${total}</h2>`;
+      items.querySelectorAll("input").forEach(inp => inp.onchange = () => {
+        const c = getCart();
+        c[inp.dataset.i].quantity = Math.max(1, parseInt(inp.value) || 1);
+        saveCart(c); renderCart();
+      });
+      items.querySelectorAll("[data-remove]").forEach(btn => btn.onclick = () => {
+        const c = getCart(); c.splice(btn.dataset.remove, 1); saveCart(c); renderCart();
+      });
     }
-
-    clearBtn.addEventListener('click', () => {
-      localStorage.removeItem('cart');
-      renderCart();
-    });
-
+    document.getElementById("clear-cart").onclick = () => { saveCart([]); renderCart(); };
     renderCart();
   </script>
 </body>

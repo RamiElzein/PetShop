@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Order confirmed - PetShop</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+  <header class="site-header">
+    <a href="index.html" class="logo">PetShop</a>
+    <nav class="main-nav">
+      <a href="index.html">Home</a>
+      <a href="products.html">Products</a>
+      <a href="cart.html">Cart (<span id="cart-count">0</span>)</a>
+      <a href="about.html">About</a>
+      <a href="login.html" id="auth-link">Log in</a>
+    </nav>
+  </header>
+  <div id="message"></div>
+
+  <main class="container narrow">
+    <div id="confirm"><p>Loading your order...</p></div>
+  </main>
+
+  <footer>&copy; 2026 PetShop. Pet supplies and enclosures for your home pets.</footer>
+  <script src="js/app.js"></script>
+  <script>
+    (async () => {
+      const id = new URLSearchParams(window.location.search).get("order");
+      const box = document.getElementById("confirm");
+      // RLS only returns this order if it belongs to the logged-in user
+      const { data: order } = await supabaseClient.from("orders")
+        .select("*, order_items(quantity, price, products(name))").eq("id", id).single();
+      if (!order) { box.innerHTML = "<p>Order not found.</p>"; return; }
+      box.innerHTML = `
+        <h1>Thank you, ${escapeHtml(order.customer_name)}!</h1>
+        <p>Your order <strong>#${order.id}</strong> has been placed.</p>
+        ${order.order_items.map(i => `<p>${i.quantity} x ${escapeHtml(i.products.name)} - ${formatPrice(i.price * i.quantity)}</p>`).join("")}
+        <h2>Total: ${formatPrice(order.total)}</h2>
+        <p>Delivering to: ${escapeHtml(order.address)}</p>
+        <a class="btn" href="products.html">Continue shopping</a>`;
+    })();
+  </script>
+</body>
+</html>
