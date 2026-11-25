@@ -35,7 +35,7 @@
       if (error || !p) { box.innerHTML = "<p>Product not found.</p>"; return; }
       box.innerHTML = `
         <div class="detail">
-          <img src="${escapeHtml(p.image || "images/cat1.jpg")}" alt="${escapeHtml(p.name)}">
+          ${productImage(p)}
           <div>
             <h1>${escapeHtml(p.name)}</h1>
             <p class="category">${escapeHtml(p.category || "")}</p>
